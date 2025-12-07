@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="起因 项目组有需要购买一台mac studio对deepseek进行微调，但是由于害怕坑点多，于是先用自己的64G m1 max随便微调一个，走一遍流程，再考虑是否购买。 但是最近半年大多数时间一直从事自动化渗透测试 智能体的开发，从来没有对llm进行过微调，所以在这里记录一下。 为什么选择mac studio   便宜，性价比高（第一次在苹果上体现出来） b站上有用户发出512G的m3 ultr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0基础 Mac 微调llm">
+<meta property="og:url" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/index.html">
+<meta property="og:site_name" content="key10000">
+<meta property="og:description" content="起因 项目组有需要购买一台mac studio对deepseek进行微调，但是由于害怕坑点多，于是先用自己的64G m1 max随便微调一个，走一遍流程，再考虑是否购买。 但是最近半年大多数时间一直从事自动化渗透测试 智能体的开发，从来没有对llm进行过微调，所以在这里记录一下。 为什么选择mac studio   便宜，性价比高（第一次在苹果上体现出来） b站上有用户发出512G的m3 ultr">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764737003379-fca91ede-0153-43f6-b999-018874abf66e.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764739003023-54fe65d1-b537-4184-a3ea-c1e60e361cf0.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207185107547.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764740231237-a0e58009-73b9-4b75-8d14-53f2a9ef47dd.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764740377733-ca2854f6-047e-4412-b07e-c433d371e0a7.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764742232175-beba082d-b508-41c7-8654-54af29028326.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207190449863.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764741326432-39dc90cb-2801-4b07-b18f-c62d5d647168.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207191258615.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764752259426-79dd3a87-1a21-4e65-a7c3-583f387f2111.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764753215356-2ed438fb-8a4e-40c0-a713-1a7c3e336b2d.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207192646684.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207192914978.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/image-20251207192741921.png">
+<meta property="article:published_time" content="2025-12-07T10:09:19.419Z">
+<meta property="article:modified_time" content="2025-12-07T11:37:31.263Z">
+<meta property="article:author" content="key10000">
+<meta property="article:tag" content="pentest,llm agent">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/assets/1764737003379-fca91ede-0153-43f6-b999-018874abf66e.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>0基础 Mac 微调llm</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2025/12/06/hello-world/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&text=0基础 Mac 微调llm"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&is_video=false&description=0基础 Mac 微调llm"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=0基础 Mac 微调llm&body=Check out this article: http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&name=0基础 Mac 微调llm&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-number">1.</span> <span class="toc-text">起因</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9mac-studio"><span class="toc-number">1.1.</span> <span class="toc-text">为什么选择mac studio</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%BA%90%E6%A8%A1%E5%9E%8B%E7%BD%91%E7%AB%99"><span class="toc-number">2.</span> <span class="toc-text">开源模型网站</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">下载模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6"><span class="toc-number">4.</span> <span class="toc-text">常见的机器学习框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-mlx"><span class="toc-number">5.</span> <span class="toc-text">安装 MLX</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E6%A0%BC%E5%BC%8F%E8%BD%AC%E6%8D%A2"><span class="toc-number">6.</span> <span class="toc-text">模型格式转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E5%91%BD%E4%BB%A4"><span class="toc-number">6.1.</span> <span class="toc-text">转换命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">转换时碰到的问题：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#no-safetensors%20found%20in%20%7Bmodel_path%7D"><span class="toc-number">6.2.1.</span> <span class="toc-text">No safetensors found in {model_path}</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">6.2.2.</span> <span class="toc-text">原因</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E9%80%89%E6%8B%A9%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">6.3.</span> <span class="toc-text">最后选择的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86pytorch%E6%A8%A1%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%BAsafetensors%E6%A0%BC%E5%BC%8F%EF%BC%9A"><span class="toc-number">6.3.1.</span> <span class="toc-text">将PyTorch模型转换为Safetensors格式：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%A4%E6%AC%A1%E8%BD%AC%E6%8D%A2%E5%90%8E%E7%9A%84%E6%A0%BC%E5%BC%8F%E9%83%BD%E6%98%AFsagetensors"><span class="toc-number">6.4.</span> <span class="toc-text">为什么两次转换后的格式都是.sagetensors</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="toc-number">6.4.1.</span> <span class="toc-text">原因</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E6%88%91%E5%B0%B1%E5%9C%A8%E6%83%B3%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%8F%AB-%60mlx%60%20%E6%88%96%20%60.mx%60%20%E5%91%A2%EF%BC%9F"><span class="toc-number">6.5.</span> <span class="toc-text">这里我就在想为什么不叫 .mlx 或 .mx 呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E6%96%B0%E4%B8%8B%E8%BD%BD%E7%9A%84%E6%A8%A1%E5%9E%8B%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8"><span class="toc-number">7.</span> <span class="toc-text">测试新下载的模型是否可用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lora%E5%BE%AE%E8%B0%83"><span class="toc-number">8.</span> <span class="toc-text">LoRA微调</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%9E%8D%E5%90%88"><span class="toc-number">9.</span> <span class="toc-text">融合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%9E%8D%E5%90%88%E8%BF%87%E7%A8%8B%E7%9A%84%E5%AE%9E%E9%99%85%E4%BD%9C%E7%94%A8"><span class="toc-number">9.1.</span> <span class="toc-text">融合过程的实际作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%9E%8D%E5%90%88%EF%BC%9F"><span class="toc-number">9.2.</span> <span class="toc-text">为什么需要融合？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E7%82%B9%EF%BC%9A"><span class="toc-number">9.3.</span> <span class="toc-text">优点：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9%EF%BC%9A"><span class="toc-number">9.4.</span> <span class="toc-text">缺点：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%9E%8D%E5%90%88%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C"><span class="toc-number">10.</span> <span class="toc-text">融合后的效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%88%E6%9E%9C%E5%A4%8D%E7%9B%98%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">11.</span> <span class="toc-text">效果复盘与思考</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        0基础 Mac 微调llm
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">key10000</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2025-12-07T10:09:19.419Z" itemprop="datePublished">2025-12-07</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="起因">起因</h2>
+<p>项目组有需要购买一台mac studio对deepseek进行微调，但是由于害怕坑点多，于是先用自己的64G m1 max随便微调一个，走一遍流程，再考虑是否购买。</p>
+<p>但是最近半年大多数时间一直从事自动化渗透测试 智能体的开发，从来没有对llm进行过微调，所以在这里记录一下。</p>
+<h3 id="为什么选择mac-studio">为什么选择mac studio</h3>
+<ul>
+<li>
+<p>便宜，性价比高（第一次在苹果上体现出来）</p>
+<p>b站上有用户发出512G的m3 ultra竟然可以跑没有量化的满血deepseek，相比大量5090或者H100,性价比很高。</p>
+</li>
+<li>
+<p>统一内存</p>
+<p>传统GPU工作站中，CPU和GPU拥有独立的内存系统，数据交换需要通过PCIe总线复制，这带来了显著的延迟和带宽限制。而Mac Studio的M系列芯片将CPU、GPU和神经网络引擎集成在同一芯片上，共享统一的高速内存池——这意味着机器学习模型能够<strong>零拷贝</strong>地在不同处理器核心间流转数据，大幅减少了内存传输开销。当运行LLM推理或模型训练时，这种架构使得MLX框架能够充分发挥硬件潜力，在相同参数规模下实现比传统架构更流畅的体验和更低的能耗，实现了&quot;内存即显存&quot;的高效计算。</p>
+</li>
+</ul>
+<h2 id="开源模型网站">开源模型网站</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https://huggingface.co</span><br><span class="line"></span><br><span class="line">//国内镜像地址</span><br><span class="line">https://hf-mirror.com</span><br></pre></td></tr></table></figure>
+<h2 id="下载模型">下载模型</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//mac安装git</span><br><span class="line">brew install git-xet</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">git xet install</span><br><span class="line"></span><br><span class="line">//这里下载的是没有经过量化版的模型</span><br><span class="line">//下载模型文件，会比较慢，模型文件比较大，耐心等待</span><br><span class="line">git clone https://hf-mirror.com/deepseek-ai/deepseek-coder-1.3b-base</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1764737003379-fca91ede-0153-43f6-b999-018874abf66e.png" alt="img"></p>
+<h2 id="常见的机器学习框架">常见的机器学习框架</h2>
+<p>这里我让deepseek整理一些常见的机器学习框架，仅供参考。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">框架名称</th>
+<th style="text-align:left">主导者/来源</th>
+<th style="text-align:left">核心特点与定位</th>
+<th style="text-align:left">典型适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>TensorFlow</strong></td>
+<td style="text-align:left">Google</td>
+<td style="text-align:left"><strong>工业级部署</strong>，拥有完整的工具链（如TensorBoard、TF Serving、TensorFlow Lite）。支持<strong>多GPU/TPU分布式训练</strong>。</td>
+<td style="text-align:left">大规模生产系统、企业级部署、移动和边缘设备应用。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PyTorch</strong></td>
+<td style="text-align:left">Meta (Facebook)</td>
+<td style="text-align:left"><strong>研究友好</strong>，采用动态计算图，调试灵活。研究社区极度活跃，是许多新算法的首选实现框架。</td>
+<td style="text-align:left">学术研究、快速原型开发、需要高度自定义模型的场景。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Keras (Keras Core)</strong></td>
+<td style="text-align:left">Google工程师创建</td>
+<td style="text-align:left"><strong>高阶API</strong>，以极简和模块化著称。<strong>支持多后端</strong>（TensorFlow、PyTorch、JAX），易于快速构建模型。</td>
+<td style="text-align:left">快速原型、教学、希望代码能在不同底层框架间切换的项目。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JAX</strong></td>
+<td style="text-align:left">Google</td>
+<td style="text-align:left"><strong>函数式编程</strong>，专为高性能数值计算和机器学习研究设计。其 <strong>“可组合的函数变换”</strong> （如<code>grad</code>、<code>jit</code>、<code>vmap</code>）在研究领域非常流行。</td>
+<td style="text-align:left">需要高性能自动微分、并行计算和硬件加速（CPU/GPU/TPU）的科学研究。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><a target="_blank" rel="noopener" href="https://ml.net/">ML.NET</a></strong></td>
+<td style="text-align:left">微软</td>
+<td style="text-align:left"><strong>面向.NET开发者</strong>的开源跨平台框架。允许C#或F#开发者构建自定义模型，无需深厚的机器学习专业知识。</td>
+<td style="text-align:left">将机器学习集成到现有的.NET应用程序、企业级后端系统。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>MLX</strong></td>
+<td style="text-align:left">Apple</td>
+<td style="text-align:left"><strong>为Apple Silicon原生优化</strong>，利用<strong>统一内存架构</strong>实现高效计算。设计借鉴PyTorch和JAX，旨在提供直观的API和在苹果设备上的最佳性能。</td>
+<td style="text-align:left"><strong>Apple Silicon</strong> (M1/M2/M3系列)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装-mlx">安装 MLX</h2>
+<p>MLX 的安装非常简单，使用 pip 即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 基础 MLX 框架</span><br><span class="line">pip install mlx</span><br></pre></td></tr></table></figure>
+<p><code>mlx-lm</code> 是 MLX 的大语言模型工具包，它提供了预训练模型的加载、转换和运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 如果你主要进行大语言模型相关工作，推荐安装 mlx-lm</span><br><span class="line">pip install mlx-lm -i https://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">#使用阿里云镜像可以大幅加速下载速度，特别适合国内用户！</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1764739003023-54fe65d1-b537-4184-a3ea-c1e60e361cf0.png" alt="img"></p>
+<h2 id="模型格式转换">模型格式转换</h2>
+<p>当你从 Hugging Face 下载一个预训练模型（如 Llama、Mistral 等），这些模型通常是用 PyTorch（.pth 或 .bin 文件）或 Safetensors 格式保存的。MLX 框架为了获得最佳性能，需要使用自己的模型格式。</p>
+<p><strong>为什么要转换格式？</strong> 主要有三个原因：</p>
+<ol>
+<li><strong>性能优化</strong>：MLX 格式针对 Apple Silicon 的统一内存架构进行了优化</li>
+<li><strong>加载速度</strong>：转换后的模型加载速度更快</li>
+<li><strong>内存效率</strong>：减少内存占用，特别是在模型推理时</li>
+</ol>
+<h3 id="转换命令">转换命令</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mlx_lm.convert --hf-path ./deepseek-coder-1.3b-base --mlx-path ./deepseek-coder-1.3b-base-mlx</span><br></pre></td></tr></table></figure>
+<h3 id="转换时碰到的问题：">转换时碰到的问题：</h3>
+<h4 id="no-safetensors found in {model_path}">No safetensors found in {model_path}</h4>
+<p><img src="./assets/image-20251207185107547.png" alt="image-20251207185107547"></p>
+<h4 id="原因">原因</h4>
+<p>mlx_lm.convert 工具在设计上<strong>优先寻找</strong> .safetensors 文件。当你提供的目录（如 <code>./deepseek-coder-1.3b-base</code>）中没有此格式文件时，便会直接报错，而不会自动识别或转换 .bin 文件。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>操作</th>
+<th>优点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>方案一：直接转换PyTorch模型</strong></td>
+<td>使用 <code>transformers</code> 库加载并保存为 <code>.safetensors</code> 格式，再使用 <code>mlx_lm.convert</code>。</td>
+<td>流程清晰，能确保获得正确的源文件。</td>
+</tr>
+<tr>
+<td><strong>方案二：从Hugging Face重新下载</strong></td>
+<td>直接从官方仓库下载包含 <code>.safetensors</code> 的模型副本。</td>
+<td>一步到位，避免格式问题。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="最后选择的方法">最后选择的方法</h3>
+<h4 id="将pytorch模型转换为safetensors格式：">将PyTorch模型转换为Safetensors格式：</h4>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoModelForCausalLM</span><br><span class="line">import torch</span><br><span class="line"></span><br><span class="line"># 1. 指定你的PyTorch模型目录</span><br><span class="line">model_path = &quot;../deepseek-coder-1.3b-base&quot;</span><br><span class="line"></span><br><span class="line"># 2. 使用transformers加载PyTorch模型 (.bin格式)</span><br><span class="line">print(&quot;正在加载PyTorch模型...&quot;)</span><br><span class="line">model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16)</span><br><span class="line"></span><br><span class="line"># 3. 保存为safetensors格式到同一目录</span><br><span class="line">print(&quot;正在保存为safetensors格式...&quot;)</span><br><span class="line">model.save_pretrained(model_path, safe_serialization=True)</span><br><span class="line"></span><br><span class="line">print(f&quot;转换完成！safetensors文件已保存至: &#123;model_path&#125;&quot;)</span><br></pre></td></tr></table></figure>
+<p>现在，源目录中已包含 <code>.safetensors</code> 文件，可以重新运行之前的转换命令：</p>
+<p><img src="./assets/1764740231237-a0e58009-73b9-4b75-8d14-53f2a9ef47dd.png" alt="img"></p>
+<p>此时在执行格式转化，完成。</p>
+<p><img src="./assets/1764740377733-ca2854f6-047e-4412-b07e-c433d371e0a7.png" alt="img"></p>
+<h3 id="为什么两次转换后的格式都是sagetensors">为什么两次转换后的格式都是.sagetensors</h3>
+<p>到了这里我发现，经过前面两次转化，两次的转化后格式都是.</p>
+<p><img src="./assets/1764742232175-beba082d-b508-41c7-8654-54af29028326.png" alt="img"></p>
+<h5 id="原因-1">原因</h5>
+<p>是<code>mlx_lm.convert</code> 命令输出的 <code>.safetensors</code> 文件确实是正确的、专为 MLX 框架优化的最终格式。它不是简单的复制，而是在后台完成了一次重要的“格式转换”。</p>
+<p><strong>核心转换：<strong>将PyTorch (或其他框架) 的</strong>权重张量布局</strong>，转换为与Apple芯片和MLX框架内存管理高度匹配的布局。保存为<strong>MLX优化的 .safetensors 文件</strong></p>
+<p>两次转化的区别为：</p>
+<table>
+<thead>
+<tr>
+<th><strong>转换目的</strong></th>
+<th>从PyTorch的 <code>.bin</code> 转换为跨框架的 <code>.safetensors</code> <strong>容器</strong>。</th>
+<th>从任何Hugging Face格式转换为 <strong>MLX优化格式</strong>。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>主要场景</strong></td>
+<td>在PyTorch/CUDA/CPU环境中使用Hugging Face模型。</td>
+<td>在<strong>Mac/MLX生态</strong>（无NVIDIA GPU）中进行本地部署和推理。</td>
+</tr>
+<tr>
+<td><strong>权重内容</strong></td>
+<td>未改变，仍是原始的PyTorch风格权重张量。</td>
+<td><strong>彻底转换</strong>，将张量布局改为Apple芯片和MLX框架最优的格式。</td>
+</tr>
+<tr>
+<td><strong>优化目标</strong></td>
+<td>确保权重能被 <code>transformers</code> 等PyTorch生态工具安全、快速地加载。</td>
+<td>确保权重能在**Apple Silicon（M系列芯片）**上获得最高推理性能和最低内存占用。</td>
+</tr>
+<tr>
+<td><strong>输出本质</strong></td>
+<td>一个“标准集装箱”，里面装着为<strong>PyTorch/GPU</strong>打包的货物。</td>
+<td>一个“标准集装箱”，里面装着为<strong>Apple Silicon/MLX</strong>重新打包和优化过的货物。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="这里我就在想为什么不叫-`mlx` 或 `.mx` 呢？">这里我就在想为什么不叫 <code>.mlx</code> 或 <code>.mx</code> 呢？</h3>
+<p>这涉及文件格式的设计原则。<code>.safetensors</code> 本身是一种<strong>安全、高效且跨框架的张量存储容器</strong>，它只负责“存放”模型的权重数据（纯数字），而不决定框架如何“解释”这些权重。</p>
+<p>你可以把 <code>.safetensors</code> 理解成一个<strong>标准化的“数据集装箱”</strong>：</p>
+<ul>
+<li><strong>PyTorch</strong> 的 <code>.safetensors</code> 文件，里面装的是适合 PyTorch 框架使用的模型权重。</li>
+<li><strong>MLX</strong> 的 <code>.safetensors</code> 文件，里面装的则是已经为 MLX 框架转换和优化过的权重。</li>
+<li>两者使用相同的“集装箱标准”（文件后缀），但内部货物的“摆放方式”（数据布局）是针对各自平台优化的，因此加载速度和内存效率最高。</li>
+</ul>
+<h2 id="测试新下载的模型是否可用">测试新下载的模型是否可用</h2>
+<p>到此为止，已经完成了mac平台上模型的下载以及转换，需要先测试一下是否可以正常运行，才能考虑接下来微调的事情。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mlx_lm.chat --model ./deepseek-coder-1.3b-mlx</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/image-20251207190449863.png" alt="image-20251207190449863"></p>
+<p>发生了新的报错，经过一番查阅，发现这个错误是因为 DeepSeek-Coder 模型没有设置 <code>chat_template</code>，而 <code>mlx_lm.chat</code> 需要这个模板来格式化对话。</p>
+<p>也就是说：</p>
+<p>当前DeepSeek-Coder模型分词器（Tokenizer）缺少必需的聊天模板配置</p>
+<p>mlx_lm.chat 命令的底层逻辑是调用 tokenizer.apply_chat_template() 方法来将对话消息（如 你好）转换成模型训练时能识别的格式。但这个转换需要依赖一个预先定义好的“聊天模板”。DeepSeek-Coder 是一个专注于代码生成的基础模型，其官方原始版本并没有配置为聊天对话设计的模板，所以无法直接使用 chat 功能。</p>
+<p>这就像你拿一个只有编译功能的文本编辑器去运行交互式程序，编辑器本身没有运行交互程序的能力，所以会报错。</p>
+<p>于是这里先使用非聊天模式进行简单测试一下（当然，这里也可以编写个脚本）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mlx_lm.generate --model ./deepseek-coder-1.3b-mlx --prompt &quot;你好&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1764741326432-39dc90cb-2801-4b07-b18f-c62d5d647168.png" alt="img"></p>
+<h2 id="lora微调">LoRA微调</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># data目录下存放数据集</span><br><span class="line">mlx_lm.lora --model ./deepseek-coder-1.3b-mlx --data ./data --iters 1000 --train</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/image-20251207191258615.png" alt="image-20251207191258615"></p>
+<p>这里有很多错误信息，是因为这里着急测试，随便找了一份之前制作的数据集，没有考虑到数据集的文本长度，导致数据集中单条数据超过了这个小参数模型的token长度限制，所以发生了错误信息，但是暂时不影响跑通这次微调的流程，所以没有进行暂停。</p>
+<p>如下：经过了1000次迭代，成功将loss降低到0.570，但是Val loss却比较高，过拟合现象非常严重。</p>
+<p><img src="./assets/1764752259426-79dd3a87-1a21-4e65-a7c3-583f387f2111.png" alt="img"></p>
+<p>这里自动保存了每100次迭代时适配器权重文件。可以根据当时的loss值，自行挑选合适的进行合体。</p>
+<p><img src="./assets/1764753215356-2ed438fb-8a4e-40c0-a713-1a7c3e336b2d.png" alt="img"></p>
+<h2 id="融合">融合</h2>
+<p>使用 MLX-LM 框架融合 LoRA 适配器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mlx_lm.fuse \</span><br><span class="line">    --model ./deepseek-coder-1.3b-mlx \</span><br><span class="line">    --adapter-path ./data/adapters/ \</span><br><span class="line">    --save-path ./deepseek-coder-lora-fused</span><br></pre></td></tr></table></figure>
+<ol>
+<li><strong><code>mlx_lm.fuse</code></strong>
+<ul>
+<li><code>fuse</code> = &quot;融合&quot;的意思</li>
+<li>这是将 LoRA 适配器权重<strong>永久合并</strong>到基础模型中的操作</li>
+<li>融合后得到一个新模型，不再需要分别加载基础模型和适配器</li>
+</ul>
+</li>
+<li><strong><code>--model</code></strong>：基础模型路径
+<ul>
+<li><code>./deepseek-coder-1.3b-mlx</code></li>
+<li>这是已经转换为 MLX 格式的 DeepSeek-Coder 1.3B 基础模型</li>
+</ul>
+</li>
+<li><strong><code>--adapter-path</code></strong>：适配器路径
+<ul>
+<li><code>./data/adapters/</code></li>
+<li>包含 LoRA 适配器权重文件（如 <code>0001000_adapters.safetensors</code>）</li>
+<li>可以是单个文件或目录（目录中会使用最新的适配器）</li>
+</ul>
+</li>
+<li><strong><code>--save-path</code></strong>：保存路径
+<ul>
+<li><code>./deepseek-coder-lora-fused</code></li>
+<li>融合后的新模型将保存到这个位置</li>
+</ul>
+</li>
+</ol>
+<h3 id="融合过程的实际作用">融合过程的实际作用</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">原始流程：</span><br><span class="line">1. 基础模型：deepseek-coder-1.3b（通用代码能力）</span><br><span class="line">2. + LoRA适配器：在特定数据集上微调（如Java代码）</span><br><span class="line">3. 运行时组合 = 具备Java专业能力的模型</span><br><span class="line"></span><br><span class="line">融合后：</span><br><span class="line">1. 新模型：deepseek-coder-lora-fused（直接具备Java专业能力）</span><br></pre></td></tr></table></figure>
+<h3 id="为什么需要融合？">为什么需要融合？</h3>
+<h3 id="优点：">优点：</h3>
+<ol>
+<li><strong>推理速度更快</strong>
+<ul>
+<li>无需在运行时应用适配器</li>
+</ul>
+</li>
+<li><strong>部署更简单</strong>
+<ul>
+<li>只需要管理一个模型文件</li>
+<li>简化了生产环境部署</li>
+</ul>
+</li>
+<li><strong>内存效率更高</strong>
+<ul>
+<li>不需要同时加载基础模型和适配器</li>
+<li>减少内存占用</li>
+</ul>
+</li>
+<li><strong>兼容性更好</strong>
+<ul>
+<li>某些框架/工具可能不支持动态LoRA</li>
+<li>融合后成为标准模型格式</li>
+</ul>
+</li>
+</ol>
+<h3 id="缺点：">缺点：</h3>
+<ol>
+<li><strong>失去灵活性</strong>
+<ul>
+<li>无法再动态切换不同适配器</li>
+<li>无法单独更新适配器</li>
+</ul>
+</li>
+<li><strong>存储占用</strong>
+<ul>
+<li>需要额外存储融合后的模型副本</li>
+</ul>
+</li>
+</ol>
+<p><img src="./assets/image-20251207192646684.png" alt="image-20251207192646684"></p>
+<h2 id="融合后的效果">融合后的效果</h2>
+<p><img src="./assets/image-20251207192914978.png" alt="image-20251207192914978"></p>
+<p><img src="./assets/image-20251207192741921.png" alt="image-20251207192741921"></p>
+<h2 id="效果复盘与思考">效果复盘与思考</h2>
+<p>在追求大模型微调的旅程中，我的这次实验更偏向于&quot;流程验证&quot;而非&quot;效果优化&quot;。整个流程走下来，意外地顺畅简单——安装环境、转换模型、准备数据、启动训练，每一步都没有遇到太多坑。</p>
+<p>不过，坦诚地说，最终的效果并不理想。模型底座的选择在很大程度上决定了微调的天花板，我这次选用的是 <strong>deepseek-coder-1.3b</strong>。从两次测试可以看出一些有趣的现象：</p>
+<p>第一次测试要求分析 Kerberos 协议，模型回答得比较泛泛；第二次测试要求写一个脚本，反而表现得更好一些。抛开答案正确性不谈，这个差异本身就值得玩味——代码生成任务可能更符合这个模型底座的原始优势。</p>
+<p>看到这样的结果，我并不意外。回顾整个过程，最关键的制约因素其实是<strong>数据集</strong>：</p>
+<ol>
+<li><strong>长度严重超标</strong>：许多技术文档和协议规范本身就冗长，直接用于训练必然影响效果</li>
+<li><strong>数据质量不均</strong>：未经过精心清洗和平衡的数据集，很难训练出高质量的适配器</li>
+<li><strong>任务匹配度</strong>：模型底座的原始能力与微调任务之间需要更好的对齐</li>
+</ol>
+<p>这次测试虽然效果有限，但验证了整个微调流程的可行性。它让我明白：</p>
+<ul>
+<li><strong>流程可行性</strong> 已得到验证，技术路径清晰</li>
+<li><strong>数据质量</strong> 是决定微调效果的关键瓶颈</li>
+<li><strong>后续优化</strong> 需要从数据清洗、任务设计、超参调整多管齐下</li>
+</ul>
+<p>大模型微调就像是&quot;数据雕刻艺术&quot;——好的底座是原材料，高质量的数据是雕刻刀，而耐心和迭代则是完成作品的不二法门。这次实验只是第一步，路还很长，但方向已经清晰。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-number">1.</span> <span class="toc-text">起因</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9mac-studio"><span class="toc-number">1.1.</span> <span class="toc-text">为什么选择mac studio</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%BA%90%E6%A8%A1%E5%9E%8B%E7%BD%91%E7%AB%99"><span class="toc-number">2.</span> <span class="toc-text">开源模型网站</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">下载模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6"><span class="toc-number">4.</span> <span class="toc-text">常见的机器学习框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-mlx"><span class="toc-number">5.</span> <span class="toc-text">安装 MLX</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E6%A0%BC%E5%BC%8F%E8%BD%AC%E6%8D%A2"><span class="toc-number">6.</span> <span class="toc-text">模型格式转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E5%91%BD%E4%BB%A4"><span class="toc-number">6.1.</span> <span class="toc-text">转换命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">转换时碰到的问题：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#no-safetensors%20found%20in%20%7Bmodel_path%7D"><span class="toc-number">6.2.1.</span> <span class="toc-text">No safetensors found in {model_path}</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">6.2.2.</span> <span class="toc-text">原因</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E9%80%89%E6%8B%A9%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">6.3.</span> <span class="toc-text">最后选择的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86pytorch%E6%A8%A1%E5%9E%8B%E8%BD%AC%E6%8D%A2%E4%B8%BAsafetensors%E6%A0%BC%E5%BC%8F%EF%BC%9A"><span class="toc-number">6.3.1.</span> <span class="toc-text">将PyTorch模型转换为Safetensors格式：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%A4%E6%AC%A1%E8%BD%AC%E6%8D%A2%E5%90%8E%E7%9A%84%E6%A0%BC%E5%BC%8F%E9%83%BD%E6%98%AFsagetensors"><span class="toc-number">6.4.</span> <span class="toc-text">为什么两次转换后的格式都是.sagetensors</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="toc-number">6.4.1.</span> <span class="toc-text">原因</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E6%88%91%E5%B0%B1%E5%9C%A8%E6%83%B3%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%8F%AB-%60mlx%60%20%E6%88%96%20%60.mx%60%20%E5%91%A2%EF%BC%9F"><span class="toc-number">6.5.</span> <span class="toc-text">这里我就在想为什么不叫 .mlx 或 .mx 呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E6%96%B0%E4%B8%8B%E8%BD%BD%E7%9A%84%E6%A8%A1%E5%9E%8B%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8"><span class="toc-number">7.</span> <span class="toc-text">测试新下载的模型是否可用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lora%E5%BE%AE%E8%B0%83"><span class="toc-number">8.</span> <span class="toc-text">LoRA微调</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%9E%8D%E5%90%88"><span class="toc-number">9.</span> <span class="toc-text">融合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%9E%8D%E5%90%88%E8%BF%87%E7%A8%8B%E7%9A%84%E5%AE%9E%E9%99%85%E4%BD%9C%E7%94%A8"><span class="toc-number">9.1.</span> <span class="toc-text">融合过程的实际作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%9E%8D%E5%90%88%EF%BC%9F"><span class="toc-number">9.2.</span> <span class="toc-text">为什么需要融合？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E7%82%B9%EF%BC%9A"><span class="toc-number">9.3.</span> <span class="toc-text">优点：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%BA%E7%82%B9%EF%BC%9A"><span class="toc-number">9.4.</span> <span class="toc-text">缺点：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%9E%8D%E5%90%88%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C"><span class="toc-number">10.</span> <span class="toc-text">融合后的效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%88%E6%9E%9C%E5%A4%8D%E7%9B%98%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-number">11.</span> <span class="toc-text">效果复盘与思考</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&text=0基础 Mac 微调llm"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&is_video=false&description=0基础 Mac 微调llm"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=0基础 Mac 微调llm&body=Check out this article: http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&title=0基础 Mac 微调llm"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://key10000.github.io/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/&name=0基础 Mac 微调llm&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2025 key10000
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-37473492-6', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+

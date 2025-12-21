@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="修改管理员密码 因为kodbox的密码是经过md5(salt.pass)过的。所以需要修改管理员密码或者添加账户之前都需要先找到salt salt位置 这里使用本地sqlite数据库，所以默认数据库是system目录下的一个12位随机命名的一个php文件。 salt的位置是在user_meta表中。如果碰到其他类型的数据库，应该也是相同的表中（这里我没有去测）。 12sqlite3 xxxxxxx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kodbox后渗透 添加管理员账户">
+<meta property="og:url" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/index.html">
+<meta property="og:site_name" content="key10000">
+<meta property="og:description" content="修改管理员密码 因为kodbox的密码是经过md5(salt.pass)过的。所以需要修改管理员密码或者添加账户之前都需要先找到salt salt位置 这里使用本地sqlite数据库，所以默认数据库是system目录下的一个12位随机命名的一个php文件。 salt的位置是在user_meta表中。如果碰到其他类型的数据库，应该也是相同的表中（这里我没有去测）。 12sqlite3 xxxxxxx">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766310888394-b0f61fcd-2c72-47a7-834c-132ab3db8a74.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766310796140-da91426a-a410-4439-9908-d412ef17eb3b.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766311161654-98d62262-3dc2-4c94-ab4f-5379a24fcfa5.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766313973631-e14c9398-783e-470c-906e-e8ae56b735fb.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766312586960-8dfc1e73-f585-4199-ba40-1d7bacffc5a2.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766312788777-6260c46b-b9a6-416c-b171-6b200f2e5226.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766312922599-a19087d9-ad7e-4631-a468-4f1cf08ac8f2.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766313457793-40ac54c2-d825-4b64-b532-7ed94f66dd95.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766313138443-23dd3a52-2de8-482c-bce7-ac69ce132034.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766313195108-83ffe5b0-33b9-42e6-9496-5c66457426ea.png">
+<meta property="og:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/image-20251221185447497.png">
+<meta property="article:published_time" content="2025-12-21T10:50:28.626Z">
+<meta property="article:modified_time" content="2025-12-21T10:54:49.616Z">
+<meta property="article:author" content="key10000">
+<meta property="article:tag" content="pentest,llm agent">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/assets/1766310888394-b0f61fcd-2c72-47a7-834c-132ab3db8a74.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>kodbox后渗透 添加管理员账户</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2025/12/07/mac%E5%BE%AE%E8%B0%83llm/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&text=kodbox后渗透 添加管理员账户"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&is_video=false&description=kodbox后渗透 添加管理员账户"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=kodbox后渗透 添加管理员账户&body=Check out this article: http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&name=kodbox后渗透 添加管理员账户&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E7%AE%A1%E7%90%86%E5%91%98%E5%AF%86%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">修改管理员密码</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#salt%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">salt位置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E7%AE%A1%E7%90%86%E5%91%98%E5%AF%86%E7%A0%81"><span class="toc-number">1.2.</span> <span class="toc-text">更新管理员密码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="toc-number">1.2.1.</span> <span class="toc-text">注意</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%AE%A1%E7%90%86%E5%91%98%E7%94%A8%E6%88%B7"><span class="toc-number">2.</span> <span class="toc-text">添加管理员用户</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Buserid"><span class="toc-number">2.1.</span> <span class="toc-text">查看userid</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0user_meta%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.</span> <span class="toc-text">添加user_meta信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81"><span class="toc-number">2.3.</span> <span class="toc-text">重新修改密码</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        kodbox后渗透 添加管理员账户
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">key10000</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2025-12-21T10:50:28.626Z" itemprop="datePublished">2025-12-21</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="修改管理员密码">修改管理员密码</h1>
+<p>因为kodbox的密码是经过md5(salt.pass)过的。所以需要修改管理员密码或者添加账户之前都需要先找到salt</p>
+<h2 id="salt位置">salt位置</h2>
+<p>这里使用本地sqlite数据库，所以默认数据库是system目录下的一个12位随机命名的一个php文件。</p>
+<p>salt的位置是在user_meta表中。如果碰到其他类型的数据库，应该也是相同的表中（这里我没有去测）。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 xxxxxxxxxxxx.php</span><br><span class="line">.tables</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766310888394-b0f61fcd-2c72-47a7-834c-132ab3db8a74.png" alt="img"></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user_meta;</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766310796140-da91426a-a410-4439-9908-d412ef17eb3b.png" alt="img"></p>
+<p>拿到salt之后去cmd5加密一下123456</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span>d5a0437c397f6cbfaf23acc293bf022</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766311161654-98d62262-3dc2-4c94-ab4f-5379a24fcfa5.png" alt="img"></p>
+<h2 id="更新管理员密码">更新管理员密码</h2>
+<p>然后更新admin密码即可（</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update user set password=&#x27;加密后的密码&#x27; where name=&#x27;需要修改的用户名&#x27;;</span><br></pre></td></tr></table></figure>
+<h3 id="注意">注意</h3>
+<ul>
+<li>员有时候可能不是admin，基本都是user表中第一列userid为1（第一个创建的用户）是系统管理员，第三列是管理员选项，</li>
+</ul>
+<p><img src="./assets/1766313973631-e14c9398-783e-470c-906e-e8ae56b735fb.png" alt="img"></p>
+<ul>
+<li>user_meta表第二列是userid，对应着user表的第一列，是系统自定添加的，无法自定义。所以寻找salt时不要选错salt了。</li>
+</ul>
+<h1 id="添加管理员用户">添加管理员用户</h1>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO <span class="string">&quot;user&quot;</span> (</span><br><span class="line">    <span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;roleID&quot;</span><span class="punctuation">,</span> <span class="string">&quot;email&quot;</span><span class="punctuation">,</span> <span class="string">&quot;phone&quot;</span><span class="punctuation">,</span> <span class="string">&quot;nickName&quot;</span><span class="punctuation">,</span> <span class="string">&quot;avatar&quot;</span><span class="punctuation">,</span> <span class="string">&quot;sex&quot;</span><span class="punctuation">,</span> <span class="string">&quot;password&quot;</span><span class="punctuation">,</span> </span><br><span class="line">    <span class="string">&quot;sizeMax&quot;</span><span class="punctuation">,</span> <span class="string">&quot;sizeUse&quot;</span><span class="punctuation">,</span> <span class="string">&quot;status&quot;</span><span class="punctuation">,</span> <span class="string">&quot;lastLogin&quot;</span><span class="punctuation">,</span> <span class="string">&quot;modifyTime&quot;</span><span class="punctuation">,</span> <span class="string">&quot;createTime&quot;</span></span><br><span class="line">) VALUES (</span><br><span class="line">    &#x27;add_user_test&#x27;<span class="punctuation">,</span>-- 添加的用户名</span><br><span class="line">    <span class="number">3</span><span class="punctuation">,</span> -- 管理员</span><br><span class="line">    &#x27;&#x27;<span class="punctuation">,</span></span><br><span class="line">    &#x27;&#x27;<span class="punctuation">,</span></span><br><span class="line">    &#x27;添加管理员测试&#x27;<span class="punctuation">,</span> -- 用户名称</span><br><span class="line">    &#x27;&#x27;<span class="punctuation">,</span></span><br><span class="line">    <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    &#x27;<span class="number">0</span>d5a0437c397f6cbfaf23acc293bf022&#x27;<span class="punctuation">,</span></span><br><span class="line">    <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    strftime(&#x27;%s&#x27;<span class="punctuation">,</span> &#x27;now&#x27;)<span class="punctuation">,</span></span><br><span class="line">    strftime(&#x27;%s&#x27;<span class="punctuation">,</span> &#x27;now&#x27;)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>查询是否成功</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user;</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766312586960-8dfc1e73-f585-4199-ba40-1d7bacffc5a2.png" alt="img"></p>
+<p>但是注意：即便user表中已经有了添加后的账户，此时还不能登录，因为kodbox为了安全性考虑，每个用户的密码使用的salt都不一样，所以我们还需要在数据库中添加一个salt</p>
+<h2 id="查看userid">查看userid</h2>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from user;</span><br></pre></td></tr></table></figure>
+<p>注意看，刚才添加的add_user_test用户前的序号也就是userid是5，可下面user_meta表中是没有5的。所以要在这里加一个。</p>
+<p><img src="./assets/1766312788777-6260c46b-b9a6-416c-b171-6b200f2e5226.png" alt="img"></p>
+<h2 id="添加user_meta信息">添加user_meta信息</h2>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO <span class="string">&quot;user_meta&quot;</span> (<span class="string">&quot;userID&quot;</span><span class="punctuation">,</span> <span class="string">&quot;key&quot;</span><span class="punctuation">,</span> <span class="string">&quot;value&quot;</span><span class="punctuation">,</span> <span class="string">&quot;createTime&quot;</span><span class="punctuation">,</span> <span class="string">&quot;modifyTime&quot;</span>) VALUES</span><br><span class="line">(<span class="number">5</span><span class="punctuation">,</span> &#x27;passwordSalt&#x27;<span class="punctuation">,</span> &#x27;KKKKKkkkkk&#x27;<span class="punctuation">,</span> <span class="number">1766312053</span><span class="punctuation">,</span> <span class="number">1766312053</span>)<span class="punctuation">,</span></span><br><span class="line">(<span class="number">5</span><span class="punctuation">,</span> &#x27;ioDriver&#x27;<span class="punctuation">,</span> &#x27;&#x27;<span class="punctuation">,</span> <span class="number">1766312053</span><span class="punctuation">,</span> <span class="number">1766312053</span>);</span><br></pre></td></tr></table></figure>
+<p>添加成功</p>
+<p><img src="./assets/1766312922599-a19087d9-ad7e-4631-a468-4f1cf08ac8f2.png" alt="img"></p>
+<h2 id="重新修改密码">重新修改密码</h2>
+<p>此时需要使用KKKKKkkkkk这个salt重新加密一个密码.</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">f031efba79034dc9f9342efb9e5c5de9</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766313457793-40ac54c2-d825-4b64-b532-7ed94f66dd95.png" alt="img"></p>
+<p>更新add_user_test的密码</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update user set password=&#x27;f031efba79034dc9f9342efb9e5c5de9&#x27; where name=&#x27;add_user_test&#x27;;</span><br></pre></td></tr></table></figure>
+<p><img src="./assets/1766313138443-23dd3a52-2de8-482c-bce7-ac69ce132034.png" alt="img"></p>
+<p>修改完成后，记得commit;</p>
+<p>即可成功登陆</p>
+<p><img src="./assets/1766313195108-83ffe5b0-33b9-42e6-9496-5c66457426ea.png" alt="img"></p>
+<p>拥有管理员权限</p>
+<p><img src="./assets/image-20251221185447497.png" alt="image-20251221185447497"></p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E7%AE%A1%E7%90%86%E5%91%98%E5%AF%86%E7%A0%81"><span class="toc-number">1.</span> <span class="toc-text">修改管理员密码</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#salt%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">salt位置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E7%AE%A1%E7%90%86%E5%91%98%E5%AF%86%E7%A0%81"><span class="toc-number">1.2.</span> <span class="toc-text">更新管理员密码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="toc-number">1.2.1.</span> <span class="toc-text">注意</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%AE%A1%E7%90%86%E5%91%98%E7%94%A8%E6%88%B7"><span class="toc-number">2.</span> <span class="toc-text">添加管理员用户</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Buserid"><span class="toc-number">2.1.</span> <span class="toc-text">查看userid</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0user_meta%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.</span> <span class="toc-text">添加user_meta信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81"><span class="toc-number">2.3.</span> <span class="toc-text">重新修改密码</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&text=kodbox后渗透 添加管理员账户"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&is_video=false&description=kodbox后渗透 添加管理员账户"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=kodbox后渗透 添加管理员账户&body=Check out this article: http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&title=kodbox后渗透 添加管理员账户"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://key10000.github.io/2025/12/21/kodbox%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81/&name=kodbox后渗透 添加管理员账户&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2025 key10000
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'G-YF79TR8ETZ', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+
+
